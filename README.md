@@ -1,5 +1,5 @@
 # Anomaly_detection_using_U-net_mask_reconstruction
-This is a baseline system for **DCASE 2020 Challenge Task 2 "Unsupervised Detection of Anomalous Sounds for Machine Condition Monitoring"**. 
+**This is a model for Unsupervised Detection of Anomalous Sounds in Driving Environment**. 
 
 http://dcase.community/challenge2020/task-unsupervised-detection-of-anomalous-sounds
 
