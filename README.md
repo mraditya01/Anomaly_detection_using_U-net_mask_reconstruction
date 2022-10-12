@@ -1,7 +1,7 @@
 # Anomaly_detection_using_U-net_mask_reconstruction
 **This is a model for Unsupervised Detection of Anomalous Sounds in Driving Environment**. 
 
-http://dcase.community/challenge2020/task-unsupervised-detection-of-anomalous-sounds
+<a href="/pdf/Anomaly Detection in Driving Urban Soundscape.pdf" class="image fit"><img src="images/marr_pic.jpg" alt=""></a>
 
 ## Description
 The baseline system consists of two main scripts:
