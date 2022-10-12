@@ -7,9 +7,9 @@ More indepth explanation about the research can be seen in the [PDFs](https://gi
 ## Description
 The system consists of two main scripts:
 - `00_train.py`
-  - This script trains models for each Machine Type by using the directory **dev_data/<Machine_Type>/train/** or **eval_data/<Machine_Type>/train/**.
+  - This script trains models for each Machine Type by using the directory **dev_data/<Machine_Type>/train/** or **eval_data/<Microphone_Number>/train/**.
 - `01_test.py`
-  - This script makes csv files for each Machine ID including the anomaly scores for each wav file in the directory **dev_data/<Machine_Type>/test/** or **eval_data/<Machine_Type>/test/**.
+  - This script makes csv files for each Machine ID including the anomaly scores for each wav file in the directory **dev_data/<Microphone_Number>/test/** or **eval_data/<Microphone_Number>/test/**.
   - The csv files will be stored in the directory **result/**.
   - If the mode is "development", it also makes the csv files including the AUC and pAUC for each Machine ID. 
 - `train.ipynb`
@@ -56,7 +56,7 @@ You can change the parameters for feature extraction and model definition by edi
 
 ### 4. Run training script (for development dataset)
 Run the training script `00_train.py`. 
-Use the option `-d` for the development dataset **dev_data/<Machine_Type>/train/**.
+Use the option `-d` for the development dataset **dev_data/<Microphone_Number>/train/**.
 ```
 $ python 00_train.py -d
 ```
@@ -79,7 +79,7 @@ $ python 01_test.py -d
 ```
 The options for `01_test.py` are the same as those for `00_train.py`.
 `01_test.py` calculates the anomaly scores for each wav file in the directory **dev_data/<Machine_Type>/test/**.
-The csv files for each Machine ID including the anomaly scores will be stored in the directory **result/**.
+The csv files for each Microphone_Number including the anomaly scores will be stored in the directory **result/**.
 If the mode is "development", the script also makes the csv files including the AUCs and pAUCs for each Machine ID. 
 
 ### 6. Check results
