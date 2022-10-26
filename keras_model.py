@@ -8,11 +8,11 @@ from keras import layers
 from keras.models import Model
 from keras.initializers import orthogonal
 from keras import activations
-
+import tensorflow as tf
+import numpy as np
 ########################################################################
 # keras model
 ########################################################################
-
 
 def Conv2DLayer(x, filters, kernel, strides, padding, block_id):
     prefix = f'block_{block_id}_'
@@ -42,13 +42,13 @@ def Transpose_Conv2D(x, filters, kernel, strides, padding, block_id):
     return x
 
 def Transpose_Conv2D2(x, filters, kernel, strides, padding, block_id):
-  prefix = f'block_{block_id}_'
-  x = layers.Conv2DTranspose(filters, kernel_size=kernel, strides=strides, padding=padding,
+    prefix = f'block_{block_id}_'
+    x = layers.Conv2DTranspose(filters, kernel_size=kernel, strides=strides, padding=padding,
                               name=prefix+'de-conv')(x)
-  x = layers.BatchNormalization(name=prefix+'conv_bn')(x)
-  x = layers.LeakyReLU(name=prefix+'lrelu')(x)
+    x = layers.BatchNormalization(name=prefix+'conv_bn')(x)
+    x = layers.LeakyReLU(name=prefix+'lrelu')(x)
 #   x = layers.Dropout(0.2, name=prefix+'drop')((x))
-  return x
+    return x
 
 
 #########################################################################
@@ -89,9 +89,8 @@ def get_model_4(input_shape):
     
     skip4 = layers.concatenate([deconv4, conv1], name='skip4')
     conv10 = Conv2DLayer(skip4, 16, (3, 3), strides=(1, 1), padding='same', block_id=17)
-    conv10 = Conv2DLayer(conv10, 16, (3, 3), strides=(1, 1), padding='same', block_id=18)
+    conv10 = Conv2DLayer2(conv10, 16, (3, 3), strides=(1, 1), padding='same', block_id=18)
     conv10 = Conv2DLayer2(conv10, 1, (3, 3), strides=(1, 1), padding='same', block_id=19)
-
     # deconv5 = Transpose_Conv2D2(conv10, 1, (3, 3), strides=(1, 1), padding='same', block_id=14)
     
 
@@ -109,24 +108,61 @@ def get_model_3(input_shape):
     conv4 = Conv2DLayer(maxpool3, 128, (3, 3), strides=(1, 1), padding='same', block_id=4)
     maxpool4 = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='maxpool4')(conv4)
     conv5 = Conv2DLayer(maxpool4, 256, (3, 3), strides=(1, 1), padding='same', block_id=5)
+    maxpool5 = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='maxpool4')(conv5)
+    conv6 = Conv2DLayer(maxpool5, 512, (3, 3), strides=(1, 1), padding='same', block_id=6)
+
+    deconv1 = Transpose_Conv2D(conv6, 256, (3, 3), strides=(2, 2), padding='same', block_id=7)
+    
+    skip1 = layers.concatenate([deconv1, conv5], name='skip1')
+    conv7 = Conv2DLayer(skip1, 256, (3, 3), strides=(1, 1), padding='same', block_id=8)
+    deconv2 = Transpose_Conv2D(conv7, 128, (3, 3), strides=(2, 2), padding='same', block_id=9)
+    
+    skip2 = layers.concatenate([deconv2, conv4], name='skip2')
+    conv8 = Conv2DLayer(skip2, 128, (3, 3), strides=(1, 1), padding='same', block_id=10)
+    deconv3 = Transpose_Conv2D2(conv8, 64, (3, 3), strides=(2, 2), padding='same', block_id=11)
+    
+    skip3 = layers.concatenate([deconv3, conv3], name='skip3')
+    conv9 = Conv2DLayer(skip3, 64, (3, 3), strides=(1, 1), padding='same', block_id=12)
+    deconv4 = Transpose_Conv2D2(conv9, 32, (3, 3), strides=(2, 2), padding='same', block_id=13)
+    
+    skip4 = layers.concatenate([deconv4, conv2], name='skip3')
+    conv10 = Conv2DLayer(skip4, 32, (3, 3), strides=(1, 1), padding='same', block_id=14)
+    deconv5 = Transpose_Conv2D2(conv10, 16, (3, 3), strides=(2, 2), padding='same', block_id=15)
+    
+    skip5 = layers.concatenate([deconv5, conv1], name='skip4')  
+    conv11 = Conv2DLayer2(skip5, 1, (3, 3), strides=(1, 1), padding='same', block_id=16)
+
+    # deconv5 = Transpose_Conv2D2(conv10, 1, (3, 3), strides=(1, 1), padding='same', block_id=14)
+    
+
+    model = Model(inputs=inputs, outputs=conv10)    
+    return model
+
+def get_model_5(input_shape):
+    inputs = layers.Input(shape=input_shape)
+    conv1 = Conv2DLayer(inputs, 16, (3, 3), strides=(1, 1), padding='same', block_id=1)
+    maxpool1 = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='maxpool1')(conv1)
+    conv2 = Conv2DLayer(maxpool1, 32, (3, 3), strides=(1, 1), padding='same', block_id=2)
+    maxpool2 = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='maxpool2')(conv2)
+    conv3 = Conv2DLayer(maxpool2, 64, (3, 3), strides=(1, 1), padding='same', block_id=3)
+    maxpool3 = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='maxpool3')(conv3)
+    conv4 = Conv2DLayer(maxpool3, 128, (3, 3), strides=(1, 1), padding='same', block_id=4)
+    maxpool4 = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='maxpool4')(conv4)
+    conv5 = Conv2DLayer(maxpool4, 256, (3, 3), strides=(1, 1), padding='same', block_id=5)
    
 
     deconv1 = Transpose_Conv2D(conv5, 128, (3, 3), strides=(2, 2), padding='same', block_id=6)
     
-    skip1 = layers.concatenate([deconv1, conv4], name='skip1')
-    conv7 = Conv2DLayer(skip1, 128, (3, 3), strides=(1, 1), padding='same', block_id=7)
+    conv7 = Conv2DLayer(deconv1, 128, (3, 3), strides=(1, 1), padding='same', block_id=7)
     deconv2 = Transpose_Conv2D(conv7, 64, (3, 3), strides=(2, 2), padding='same', block_id=8)
     
-    skip2 = layers.concatenate([deconv2, conv3], name='skip2')
-    conv8 = Conv2DLayer(skip2, 64, (3, 3), strides=(1, 1), padding='same', block_id=9)
+    conv8 = Conv2DLayer(deconv2, 64, (3, 3), strides=(1, 1), padding='same', block_id=9)
     deconv3 = Transpose_Conv2D2(conv8, 32, (3, 3), strides=(2, 2), padding='same', block_id=10)
     
-    skip3 = layers.concatenate([deconv3, conv2], name='skip3')
-    conv9 = Conv2DLayer(skip3, 32, (3, 3), strides=(1, 1), padding='same', block_id=11)
+    conv9 = Conv2DLayer(deconv3, 32, (3, 3), strides=(1, 1), padding='same', block_id=11)
     deconv4 = Transpose_Conv2D2(conv9, 16, (3, 3), strides=(2, 2), padding='same', block_id=12)
     
-    skip4 = layers.concatenate([deconv4, conv1], name='skip4')  
-    conv10 = Conv2DLayer2(skip4, 1, (3, 3), strides=(1, 1), padding='same', block_id=13)
+    conv10 = Conv2DLayer2(deconv4, 1, (3, 3), strides=(1, 1), padding='same', block_id=13)
 
     # deconv5 = Transpose_Conv2D2(conv10, 1, (3, 3), strides=(1, 1), padding='same', block_id=14)
     
